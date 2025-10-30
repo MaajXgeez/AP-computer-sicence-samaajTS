@@ -66,3 +66,10 @@ def get_season_Results_By_team(year, team):
     )
 
     return team_games[["week", "home_team", "away_team", "points_for", "points_against", "result"]]
+
+
+number = input()
+values = []
+
+
+while number != 
