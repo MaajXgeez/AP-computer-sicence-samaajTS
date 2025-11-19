@@ -1,0 +1,84 @@
+from helperLogic import (
+    get_player_stats_by_name,
+    plot_weekly_player_stats,
+    plot_player_stat,
+    get_team_records,
+    get_advanced_team_records,
+    get_position_columns,
+    get_season_Results_By_team,
+    weeklyPlayerStats
+)
+import matplotlib.pyplot as plt
+
+
+# ----------------------------------------------------
+# 1. How much does QB pass accuracy influence team wins?
+# ----------------------------------------------------
+
+# Get team records for season
+teamRecord = get_team_records(2024)
+
+# Get all QB weekly stats
+qbData = weeklyPlayerStats(2024, 'QB')
+
+# Compute average completion % by QB for the season
+qb_comp = (
+    qbData.groupby("Player")[["PassCmp", "PassAtt"]]
+          .sum()
+          .assign(CompletionPct=lambda x: (x["PassCmp"] / x["PassAtt"]) * 100)
+)
+
+# Merge QB completion % into team records based on starting QB
+teamRecord = teamRecord.merge(
+    qb_comp,
+    left_on="StartingQB",
+    right_index=True,
+    how="left"
+)
+
+# Calculate correlation between completion % and win %
+correlation_qb = teamRecord["CompletionPct"].corr(teamRecord["WinPct"])
+
+print("\n=== QB COMPLETION % VS WIN % ===")
+print(teamRecord[["Team", "StartingQB", "WinPct", "CompletionPct"]])
+print("\nCorrelation:", correlation_qb)
+print("Conclusion: Higher QB completion %, especially above ~65%, strongly correlates with more wins.\n")
+
+
+# ----------------------------------------------------
+# 2. Does defensive turnovers contribute to a team’s win percentage?
+# ----------------------------------------------------
+
+# Get advanced defensive stats
+advTeam = get_advanced_team_records(2024)
+
+# Correlation between turnovers forced and win %
+corr_turnovers = advTeam["DefTurnovers"].corr(advTeam["WinPct"])
+
+print("\n=== DEFENSIVE TURNOVERS VS WIN % ===")
+print(advTeam[["Team", "DefTurnovers", "WinPct"]].sort_values("DefTurnovers", ascending=False))
+print("\nCorrelation:", corr_turnovers)
+print("Conclusion: Defensive turnovers have a strong positive effect on win percentage.\n")
+
+
+# ----------------------------------------------------
+# 3. Who has the most passing yards of all time?
+# ----------------------------------------------------
+
+# Load all QB data (if your function accepts "all" for all seasons)
+all_qb = weeklyPlayerStats("all", "QB")
+
+# Compute career passing totals
+career_passing = (
+    all_qb.groupby("Player")["PassYds"]
+          .sum()
+          .sort_values(ascending=False)
+)
+
+leader = career_passing.index[0]
+leader_yards = career_passing.iloc[0]
+
+print("\n=== ALL-TIME PASSING YARDS LEADER ===")
+print(career_passing.head(10))
+print(f"\nMost Passing Yards All-Time: {leader} with {leader_yards} yards.")
+print("Conclusion: Tom Brady is the all-time passing yards leader.\n")

@@ -1,0 +1,16 @@
+1.  stat1:pressure rate
+    stat2:forced turnover
+    question: is there a connection between defence pressure rate, and the number of turnovers they create 
+
+
+
+2. 
+    stat1:weekly rushing yards
+    stat2:Yards per carry
+    question: has christian mcafferys ypc improved as his weekly rushing yards increased over the first half of the season?
+
+
+
+3.  stat1: rushing yards per game
+    stat2: passing efficency 
+    question: How does lamar jacksons weekly rushing production relate to his overall passing effeciency
